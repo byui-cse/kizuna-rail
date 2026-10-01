@@ -1,15 +1,37 @@
 import challengeScenariosRouter from './scenarios.js';
 import railRoutesRouter from './routes.js';
 import { Router } from 'express';
+import swaggerUi from 'swagger-ui-express';
+import YAML from 'yamljs';
+import { fileURLToPath } from 'node:url';
 import { homePage, aboutPage, testErrorPage } from './index.js';
+import { loginUser, logoutUser, registerUser } from '../controllers/auth.js';
+import { tripsApi, tripsPage } from '../controllers/trips.js';
+import { requirePageRole } from '../middleware/auth.js';
 
 const router = Router();
+const swaggerDocument = YAML.load(fileURLToPath(new URL('../../docs/openapi.yaml', import.meta.url)));
+
+router.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+router.get('/register', (req, res) => res.render('register', { title: 'Register' }));
+router.post('/register', registerUser);
+router.get('/login', (req, res) => res.render('login', { title: 'Login' }));
+router.post('/login', loginUser);
+router.post('/logout', logoutUser);
+router.get('/admin', requirePageRole('admin'), (req, res) => {
+	res.render('admin', { title: 'Admin Dashboard', user: req.session.user });
+});
 
 // Home page
 router.get('/', homePage);
 
 // About page
 router.get('/about', aboutPage);
+
+// Trips API and paginated list page
+router.get('/api/trips', tripsApi);
+router.get('/trips', tripsPage);
 
 // Rail routes
 router.use('/routes', railRoutesRouter);
