@@ -1,15 +1,41 @@
 import challengeScenariosRouter from './scenarios.js';
 import railRoutesRouter from './routes.js';
 import { Router } from 'express';
+import swaggerUi from 'swagger-ui-express';
+import YAML from 'yamljs';
+import { fileURLToPath } from 'node:url';
 import { homePage, aboutPage, testErrorPage } from './index.js';
+import { loginUser, logoutUser, registerUser } from '../controllers/auth.js';
+import { createTrip, deleteTrip, getTripApi, tripsApi, tripsPage, updateTrip } from '../controllers/trips.js';
+import { requireApiRole, requirePageRole } from '../middleware/auth.js';
 
 const router = Router();
+const swaggerDocument = YAML.load(fileURLToPath(new URL('../../docs/openapi.yaml', import.meta.url)));
+
+router.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+router.get('/register', (req, res) => res.render('register', { title: 'Register' }));
+router.post('/register', registerUser);
+router.get('/login', (req, res) => res.render('login', { title: 'Login' }));
+router.post('/login', loginUser);
+router.post('/logout', logoutUser);
+router.get('/admin', requirePageRole('admin'), (req, res) => {
+	res.render('admin/dashboard', { title: 'Admin Dashboard', user: req.session.user });
+});
 
 // Home page
 router.get('/', homePage);
 
 // About page
 router.get('/about', aboutPage);
+
+// Trips API and paginated list page
+router.get('/api/trips', tripsApi);
+router.get('/api/trips/:id', getTripApi);
+router.post('/api/trips', requireApiRole('admin'), createTrip);
+router.put('/api/trips/:id', requireApiRole('admin'), updateTrip);
+router.delete('/api/trips/:id', requireApiRole('admin'), deleteTrip);
+router.get('/trips', tripsPage);
 
 // Rail routes
 router.use('/routes', railRoutesRouter);

@@ -302,3 +302,65 @@
         }
     }
 }
+
+.trip-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-md);
+    margin: var(--space-xl) 0;
+
+    button {
+        padding: var(--space-sm) var(--space-lg);
+        border: 1px solid var(--clr-primary);
+        border-radius: var(--radius-sm);
+        background: var(--clr-primary);
+        color: var(--clr-text-alt-primary);
+        cursor: pointer;
+
+        &:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        &:focus-visible {
+            outline: 2px solid var(--clr-accent);
+            outline-offset: 2px;
+        }
+    }
+}
+
+.trip-filters {
+    display: flex;
+    align-items: end;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+    margin: var(--space-lg) 0;
+
+    label {
+        font-weight: 600;
+    }
+
+    select,
+    input,
+    button {
+        min-height: 2.5rem;
+        padding: var(--space-sm) var(--space-md);
+        border: 1px solid var(--clr-text-muted);
+        border-radius: var(--radius-sm);
+        background: var(--clr-surface);
+        color: var(--clr-text-primary);
+        font: inherit;
+    }
+
+    input {
+        flex: 1 1 14rem;
+    }
+
+    button {
+        border-color: var(--clr-primary);
+        background: var(--clr-primary);
+        color: var(--clr-text-alt-primary);
+        cursor: pointer;
+    }
+}
